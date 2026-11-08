@@ -90,12 +90,12 @@ jobs:
         env:
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GHCR_USERNAME: ${{ github.actor }}
-        shell: pwsh
+        shell: powershell
         run: |
           "$env:GHCR_TOKEN" | docker login ghcr.io --username "$env:GHCR_USERNAME" --password-stdin
 
       - name: Pull latest Docker image
-        shell: pwsh
+        shell: powershell
         run: |
           docker pull ghcr.io/betty5562/ai-chat-docker:latest
 
@@ -103,7 +103,7 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-        shell: pwsh
+        shell: powershell
         run: |
           if ([string]::IsNullOrWhiteSpace($env:GEMINI_API_KEY)) {
             throw "GEMINI_API_KEY secret is missing."
@@ -136,7 +136,7 @@ jobs:
           }
 
       - name: Verify deployment
-        shell: pwsh
+        shell: powershell
         run: |
           Start-Sleep -Seconds 10
           docker ps --filter "name=ai-agent-app"
