@@ -88,7 +88,7 @@ jobs:
     steps:
       - name: Log in to GitHub Container Registry
         env:
-          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
           GHCR_USERNAME: ${{ github.actor }}
         shell: powershell
         run: |
@@ -98,6 +98,9 @@ jobs:
         shell: powershell
         run: |
           docker pull ghcr.io/betty5562/ai-chat-docker:latest
+          if ($LASTEXITCODE -ne 0) {
+            throw "Could not pull the Docker image."
+          }
 
       - name: Replace running container
         env:
@@ -113,10 +116,18 @@ jobs:
             throw "DJANGO_SECRET_KEY secret is missing."
           }
 
-          docker rm -f ai-agent-app
+          $existing = docker ps -aq --filter "name=^/ai-agent-app$"
 
           if ($LASTEXITCODE -ne 0) {
-            throw "Could not remove the previous container."
+            throw "Could not check existing containers."
+          }
+
+          if ($existing) {
+            docker rm -f ai-agent-app
+
+            if ($LASTEXITCODE -ne 0) {
+              throw "Could not remove the previous container."
+            }
           }
 
           docker run -d `
@@ -140,4 +151,9 @@ jobs:
         run: |
           Start-Sleep -Seconds 10
           docker ps --filter "name=ai-agent-app"
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "Could not verify the deployment."
+          }
+
           docker logs --tail 30 ai-agent-app
