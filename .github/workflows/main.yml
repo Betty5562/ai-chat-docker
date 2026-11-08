@@ -67,9 +67,13 @@ jobs:
         uses: docker/login-action@v4
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: Betty5562
+          password: ${{ secrets.GHCR_TOKEN }}
 
+      - name: Pull image on Windows
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: docker pull --platform linux/amd64 ghcr.io/betty5562/ai-chat-docker:latest
       - name: Build and push Docker image
         uses: docker/build-push-action@v7
         with:
