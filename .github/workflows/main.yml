@@ -78,3 +78,66 @@ jobs:
           tags: |
             ghcr.io/betty5562/ai-chat-docker:latest
             ghcr.io/betty5562/ai-chat-docker:${{ github.sha }}
+
+  deploy:
+    name: Deploy to Local Docker
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, Windows, X64]
+
+    steps:
+      - name: Log in to GitHub Container Registry
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHCR_USERNAME: ${{ github.actor }}
+        shell: pwsh
+        run: |
+          "$env:GHCR_TOKEN" | docker login ghcr.io --username "$env:GHCR_USERNAME" --password-stdin
+
+      - name: Pull latest Docker image
+        shell: pwsh
+        run: |
+          docker pull ghcr.io/betty5562/ai-chat-docker:latest
+
+      - name: Replace running container
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+        shell: pwsh
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:GEMINI_API_KEY)) {
+            throw "GEMINI_API_KEY secret is missing."
+          }
+
+          if ([string]::IsNullOrWhiteSpace($env:DJANGO_SECRET_KEY)) {
+            throw "DJANGO_SECRET_KEY secret is missing."
+          }
+
+          docker rm -f ai-agent-app
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "Could not remove the previous container."
+          }
+
+          docker run -d `
+            --name ai-agent-app `
+            --restart unless-stopped `
+            -p 8000:8000 `
+            --volume inventory_data:/app/data `
+            --env DATABASE_PATH=/app/data/db.sqlite3 `
+            --env "GEMINI_API_KEY=$env:GEMINI_API_KEY" `
+            --env "DJANGO_SECRET_KEY=$env:DJANGO_SECRET_KEY" `
+            --env DEBUG=False `
+            --env ALLOWED_HOSTS=localhost,127.0.0.1 `
+            ghcr.io/betty5562/ai-chat-docker:latest
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "Docker container failed to start."
+          }
+
+      - name: Verify deployment
+        shell: pwsh
+        run: |
+          Start-Sleep -Seconds 10
+          docker ps --filter "name=ai-agent-app"
+          docker logs --tail 30 ai-agent-app
