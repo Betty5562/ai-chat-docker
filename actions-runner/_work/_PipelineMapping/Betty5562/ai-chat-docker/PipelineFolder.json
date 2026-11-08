@@ -1,0 +1,12 @@
+﻿{
+  "repositoryName": "Betty5562/ai-chat-docker",
+  "pipelineDirectory": "ai-chat-docker",
+  "workspaceDirectory": "ai-chat-docker\\ai-chat-docker",
+  "repositories": {
+    "Betty5562/ai-chat-docker": {
+      "repositoryPath": "ai-chat-docker\\ai-chat-docker",
+      "lastRunOn": "11/08/2026 13:40:29 +02:00"
+    }
+  },
+  "lastRunOn": "11/08/2026 14:44:09 +02:00"
+}
