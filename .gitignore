@@ -1,27 +1,8 @@
-@'
-# Python virtual environments
 venv/
 .venv/
-env/
-
-# Environment variables and secrets
+__pycache__/
+*.pyc
 .env
 *.env
-!.env.example
-
-# Python generated files
-__pycache__/
-*.py[cod]
-*.pyo
-
-# Django database
 db.sqlite3
-*.sqlite3
-
-# Local data
-data/
-
-# IDE
-.idea/
-.vscode/
-'@ | Set-Content .gitignore
+.DS_Store

@@ -1,0 +1,11 @@
+﻿{
+  "agentId": 21,
+  "agentName": "ai-agent-deploy",
+  "poolId": 1,
+  "poolName": "Default",
+  "serverUrl": "https://pipelinesghubeus11.actions.githubusercontent.com/afqnzpNg2AYwaOYnnPGEzKVOp2eyNKa2XWBbPTpRdDK52xh5L1/",
+  "gitHubUrl": "https://github.com/Betty5562/ai-chat-docker",
+  "workFolder": "_work",
+  "useV2Flow": true,
+  "serverUrlV2": "https://broker.actions.githubusercontent.com/"
+}

@@ -82,9 +82,10 @@ jobs:
       - name: Pull latest Docker image
         shell: powershell
         run: docker pull ghcr.io/betty5562/ai-chat-docker:latest
-
       - name: Deploy container locally
         shell: powershell
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           $existing = docker ps -aq --filter "name=^/ai-agent-app$"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -98,7 +99,7 @@ jobs:
             -p 8000:8000 `
             --volume inventory_data:/app/data `
             --env DATABASE_PATH=/app/data/db.sqlite3 `
-            --env "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" `
+            --env "GEMINI_API_KEY=$env:GEMINI_API_KEY" `
             --env "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" `
             --env DEBUG=False `
             --env ALLOWED_HOSTS=localhost,127.0.0.1 `
